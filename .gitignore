@@ -1,0 +1,6 @@
+.project
+.classpath
+.settings/
+target/
+widgetsets/
+hs_err_pid*.log
