@@ -142,14 +142,14 @@ public class ReportFileParser {
      */
     private String constructFileName(Date date, String filePrefix) {
         String root = properties.getRootScanDirectory();
-        if (!root.endsWith("\\")) {
-            root = root + "\\";
+        if (!root.endsWith(File.separator)) {
+            root = root + File.separator;
         }
         SimpleDateFormat fileDateFormat = new SimpleDateFormat(
                 properties.getFileDateFormat());
         SimpleDateFormat folderDateFormat = new SimpleDateFormat(
                 properties.getFolderDateFormat());
-        String fileName = root + folderDateFormat.format(date) + "\\"
+        String fileName = root + folderDateFormat.format(date) + File.separator
                 + filePrefix + fileDateFormat.format(date) + ".xml";
         return fileName;
     }

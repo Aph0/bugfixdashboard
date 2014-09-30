@@ -42,6 +42,7 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
+	
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>

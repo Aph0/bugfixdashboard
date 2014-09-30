@@ -20,6 +20,8 @@ import com.vaadin.addon.charts.model.PlotOptionsPie;
 import com.vaadin.addon.charts.model.PlotOptionsSpline;
 import com.vaadin.addon.charts.model.Title;
 import com.vaadin.addon.charts.model.ZoomType;
+import com.vaadin.event.LayoutEvents.LayoutClickEvent;
+import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -87,6 +89,15 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
         chartLink.add(ChartTypes.PIE);
         chartLink.add(ChartTypes.HISTORY);
+
+        grid.addLayoutClickListener(new LayoutClickListener() {
+
+            @Override
+            public void layoutClick(LayoutClickEvent event) {
+                System.out.println(event.getClickedComponent());
+
+            }
+        });
 
     }
 
@@ -281,6 +292,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
             spacer += "&nbsp;&nbsp;&nbsp;&nbsp;";
         }
         Label l = new Label(spacer + text);
+        l.addStyleName("level-" + level);
         l.setContentMode(ContentMode.HTML);
         return l;
 
@@ -295,6 +307,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     private void traverseLevelsRecursively(ReportLevel level) {
         Label left = createLeftSpacedLabel(level.getName(), level.getLevel());
         Label right = new Label(level.getValue() + "");
+        right.addStyleName("level-" + level.getLevel());
         right.setWidth(null);
         addGridRow(left, right);
         for (ReportLevel child : level.getChildren()) {

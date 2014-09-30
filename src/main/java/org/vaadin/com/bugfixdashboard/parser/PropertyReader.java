@@ -100,9 +100,7 @@ public class PropertyReader {
             throw new FileNotFoundException("property file '" + propFileName
                     + "' not found in the classpath");
         }
-
         return properties;
-
     }
 
     /**

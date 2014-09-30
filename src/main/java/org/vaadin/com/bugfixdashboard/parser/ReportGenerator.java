@@ -53,7 +53,7 @@ public class ReportGenerator {
                     bfpReport, supportReport, tcReport);
             summary.addDay(reportDay);
             if (reportDay.hasReports()) {
-                System.out.println("DAY WAS FOUND!");
+                System.out.println("This day has atleast one report!");
             }
 
             cal.add(Calendar.DATE, 1);

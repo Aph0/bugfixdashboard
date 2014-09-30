@@ -1,5 +1,6 @@
 package org.vaadin.com.bugfixdashboard.views;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,6 +70,8 @@ public class ReportPresenter {
 
             List<ReportLevel> pieChartData = latestReport
                     .getAllReportLevelsAsList(2);
+            // We exclude first level and nodes that are not leafs.
+            pieChartData = sortOutOtherThanLeafNodes(pieChartData);
 
             view.showReport(type, historyData, latestReport, pieChartData);
         } else {
@@ -76,6 +79,16 @@ public class ReportPresenter {
             view.showEmptyReport(type);
         }
 
+    }
+
+    private List<ReportLevel> sortOutOtherThanLeafNodes(List<ReportLevel> levels) {
+        List<ReportLevel> result = new ArrayList<ReportLevel>();
+        for (ReportLevel level : levels) {
+            if (!level.hasChildren()) {
+                result.add(level);
+            }
+        }
+        return result;
     }
 
     private HierarchicalReport getMostRecentReportFromSummary(ReportType type,
