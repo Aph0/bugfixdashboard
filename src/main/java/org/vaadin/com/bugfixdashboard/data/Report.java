@@ -13,6 +13,6 @@ public interface Report {
      * @param reportLevel
      * @return
      */
-    Integer getValueForReportLevel(ReportLevel reportLevel);
+    Number getValueForReportLevel(ReportLevel reportLevel);
 
 }

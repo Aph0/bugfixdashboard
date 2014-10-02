@@ -172,7 +172,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     }
 
     /**
-     * Sets the data to be displayed in the pie chart
+     * Sets the data to be displayed in the pie chart. If a level has no value,
+     * it is discarded
      * 
      * @param raportLevels
      */
@@ -180,6 +181,9 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
         DataSeries ds = new DataSeries();
         for (ReportLevel rl : raportLevels) {
+            if (!rl.hasValue()) {
+                continue;
+            }
             ds.add(new DataSeriesItem(rl.getName(), rl.getValue()));
         }
         pieChart.getConfiguration().addSeries(ds);
@@ -306,8 +310,13 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     private void traverseLevelsRecursively(ReportLevel level) {
         Label left = createLeftSpacedLabel(level.getName(), level.getLevel());
-        Label right = new Label(level.getValue() + "");
-        right.addStyleName("level-" + level.getLevel());
+        Label right = null;
+        if (level.hasValue()) {
+            right = new Label(level.getValue() + "");
+            right.addStyleName("level-" + level.getLevel());
+        } else {
+            right = new Label("");
+        }
         right.setWidth(null);
         addGridRow(left, right);
         for (ReportLevel child : level.getChildren()) {

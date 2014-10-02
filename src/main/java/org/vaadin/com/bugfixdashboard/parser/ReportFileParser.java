@@ -83,7 +83,7 @@ public class ReportFileParser {
             // TODO: When using Jsoup (because it is a very fast way to get your
             // hands on), the xml is wrapped with html. Let's start the root
             // searching from the <body> tag
-            List<Element> rootBody = doc.getElementsByTag("body");
+            List<Element> rootBody = doc.getElementsByTag("measurementcontent");
             if (rootBody.size() <= 0) {
                 System.out
                         .println("Warning! No data found in file or file format has changed: "
@@ -115,7 +115,7 @@ public class ReportFileParser {
     private ReportLevel createReportLevelsRecursively(Element element,
             ReportLevel reportParent) {
         String name = element.attr("name");
-        Integer value = getIntegerFrom(element.attr("value"));
+        Number value = getNumberFrom(element.attr("value"));
         ReportLevel reportLevel = new ReportLevel(reportParent, name, value);
         for (Element el : element.children()) {
             reportLevel
@@ -126,11 +126,23 @@ public class ReportFileParser {
 
     }
 
-    private Integer getIntegerFrom(String string) {
+    private Number getNumberFrom(String string) {
         if (string == null || string.equals("")) {
             return null;
         }
-        return Integer.parseInt(string);
+        Number number = null;
+        try {
+            return Integer.parseInt(string);
+        } catch (NumberFormatException nfe) {
+
+        }
+
+        try {
+            return Double.parseDouble(string);
+        } catch (NumberFormatException nfe) {
+            System.err.println();
+        }
+        return null;
     }
 
     /**

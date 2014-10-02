@@ -9,11 +9,11 @@ public class ReportLevel {
 
     private final String name;
 
-    private final Integer value;
+    private final Number value;
 
     private List<ReportLevel> children = new ArrayList<ReportLevel>();
 
-    public ReportLevel(ReportLevel parent, String name, Integer value) {
+    public ReportLevel(ReportLevel parent, String name, Number value) {
         this.parent = parent;
         this.name = name;
         this.value = value;
@@ -90,8 +90,12 @@ public class ReportLevel {
         return name;
     }
 
-    public Integer getValue() {
+    public Number getValue() {
         return value;
+    }
+
+    public boolean hasValue() {
+        return value != null;
     }
 
 }

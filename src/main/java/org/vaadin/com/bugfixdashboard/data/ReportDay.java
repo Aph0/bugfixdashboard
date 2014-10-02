@@ -76,9 +76,9 @@ public class ReportDay {
 
         public final Date date;
 
-        public final Integer value;
+        public final Number value;
 
-        public DateAndValue(Date date, Integer value) {
+        public DateAndValue(Date date, Number value) {
             this.date = date;
             this.value = value;
         }

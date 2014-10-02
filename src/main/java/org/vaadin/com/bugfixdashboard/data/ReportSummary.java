@@ -153,7 +153,7 @@ public class ReportSummary {
             if (report == null) {
                 continue;
             }
-            Integer value = report.getValueForReportLevel(reportLevel);
+            Number value = report.getValueForReportLevel(reportLevel);
             if (value == null) {
                 continue;
             }

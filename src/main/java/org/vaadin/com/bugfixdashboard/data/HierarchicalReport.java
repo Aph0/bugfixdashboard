@@ -42,7 +42,7 @@ public class HierarchicalReport implements Report {
     }
 
     @Override
-    public Integer getValueForReportLevel(ReportLevel reportLevel) {
+    public Number getValueForReportLevel(ReportLevel reportLevel) {
         List<ReportLevel> allReportLevels = getAllReportLevelsAsList();
         int index = allReportLevels.indexOf(reportLevel);
         if (index < 0) {

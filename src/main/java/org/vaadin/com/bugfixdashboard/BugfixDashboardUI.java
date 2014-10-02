@@ -32,12 +32,13 @@ public class BugfixDashboardUI extends UI {
     protected void init(VaadinRequest request) {
 
         setContent(mainLayout);
+        boolean forceReload = (request.getParameter("forcereload") != null);
 
         mainLayout.setSizeFull();
         ReportSummary reportSummary = null;
         int visibleDaySpan = 1;
         try {
-            reportSummary = ReportReader.getReportSummary(false);
+            reportSummary = ReportReader.getReportSummary(forceReload);
         } catch (IOException e) {
             e.printStackTrace();
             Label l = new Label("Could not read the report data! "
