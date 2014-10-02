@@ -158,6 +158,9 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         removeStyleName(HAS_NO_REPORTS_STYLENAME);
         header.setValue(report.getHeader() + " ("
                 + formatDate(report.getReportDate()) + ")");
+        if (report.isDue()) {
+            header.addStyleName("is-due");
+        }
 
         for (ReportLevel level : report.getReportRoots()) {
             traverseLevelsRecursively(level);

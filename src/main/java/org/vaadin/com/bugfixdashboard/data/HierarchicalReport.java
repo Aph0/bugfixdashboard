@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.vaadin.com.bugfixdashboard.util.DateUtil;
+
 public class HierarchicalReport implements Report {
 
     private final String header;
@@ -104,4 +106,15 @@ public class HierarchicalReport implements Report {
         return result;
     }
 
+    /**
+     * The report is considered due if the dates do not match on a
+     * day-granularity
+     * 
+     * @return
+     */
+    public boolean isDue() {
+        Date now = new Date();
+        return !DateUtil.isInDateRangeOnDayPrecision(now, now, date);
+
+    }
 }
