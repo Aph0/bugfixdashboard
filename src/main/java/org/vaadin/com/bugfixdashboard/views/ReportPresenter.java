@@ -108,6 +108,9 @@ public class ReportPresenter {
         for (ReportLevel level : forReport.getAllReportLevelsAsList()) {
             List<DateAndValue> dAv = summary.getHistoryDataForReportLevel(type,
                     level, start, end);
+            if (dAv.isEmpty()) {
+                continue;
+            }
             historyData.put(level.getName(), dAv);
         }
         return historyData;

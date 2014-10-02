@@ -94,7 +94,7 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
 
         multiComponent.setPieChartData(pieChartData);
 
-        multiComponent.setWidth("650px");
+        multiComponent.setWidth("700px");
         componentContainer.addComponent(multiComponent);
 
     }
