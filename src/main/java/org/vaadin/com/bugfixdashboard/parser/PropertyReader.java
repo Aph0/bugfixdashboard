@@ -14,6 +14,7 @@ public class PropertyReader {
     private static final String FILEPREFIX_BFP = "fileprefix_bfp";
     private static final String FILEPREFIX_SUPPORT = "fileprefix_support";
     private static final String FILEPREFIX_TEAMCITY = "fileprefix_failingtests";
+    private static final String FILEPREFIX_SUPPORT_STATUS = "fileprefix_support_status";
 
     private static final String DAY_DATE_FORMAT = "file_date_format";
     private static final String FOLDER_DATE_FORMAT = "folder_date_format";
@@ -32,6 +33,7 @@ public class PropertyReader {
     private String filePrefixBFP;
     private String filePrefixSupport;
     private String filePrefixTeamCity;
+    private String filePrefixSupportStatus;
 
     private String fileDateFormat;
     private String folderDateFormat;
@@ -60,6 +62,8 @@ public class PropertyReader {
         filePrefixBFP = currentProperties.getProperty(FILEPREFIX_BFP);
         filePrefixSupport = currentProperties.getProperty(FILEPREFIX_SUPPORT);
         filePrefixTeamCity = currentProperties.getProperty(FILEPREFIX_TEAMCITY);
+        filePrefixSupportStatus = currentProperties
+                .getProperty(FILEPREFIX_SUPPORT_STATUS);
         fileDateFormat = currentProperties.getProperty(DAY_DATE_FORMAT);
         folderDateFormat = currentProperties.getProperty(FOLDER_DATE_FORMAT);
     }
@@ -132,6 +136,10 @@ public class PropertyReader {
 
         public String getFilePrefixSupport() {
             return filePrefixSupport;
+        }
+
+        public String getFilePrefixSupportStatus() {
+            return filePrefixSupportStatus;
         }
 
         public String getFilePrefixTeamCity() {

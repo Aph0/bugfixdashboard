@@ -61,6 +61,19 @@ public class ReportFileParser {
      * @param date
      * @return null if no such report was found for specified date
      */
+    public HierarchicalReport parseSupportStatusReport(final Date date) {
+        HierarchicalReport report = new HierarchicalReport(
+                DateUtil.clearDateBelowDays(date),
+                ReportType.SUPPORT_STATUS.realName());
+
+        return parseReport(date, properties.getFilePrefixSupportStatus(),
+                report);
+    }
+
+    /**
+     * @param date
+     * @return null if no such report was found for specified date
+     */
     public HierarchicalReport parseTeamCityReport(final Date date) {
         HierarchicalReport report = new HierarchicalReport(
                 DateUtil.clearDateBelowDays(date),
@@ -92,7 +105,7 @@ public class ReportFileParser {
             }
             if (rootBody.size() > 1) {
                 System.out
-                        .println("Warning! Found more than one <body> elements: "
+                        .println("Warning! Found more than one <measurementcontent> elements: "
                                 + fileName);
                 return null;
             }
@@ -132,7 +145,7 @@ public class ReportFileParser {
         }
         Number number = null;
         try {
-            return Integer.parseInt(string);
+            return Integer.parseInt(string.trim());
         } catch (NumberFormatException nfe) {
 
         }

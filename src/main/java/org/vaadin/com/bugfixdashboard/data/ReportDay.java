@@ -18,16 +18,19 @@ public class ReportDay {
 
     private final HierarchicalReport supportReport;
 
+    private final HierarchicalReport supportStatusReport;
+
     private final HierarchicalReport tcReport;
 
     public ReportDay(Date day, HierarchicalReport reviewReport,
             HierarchicalReport bfpReport, HierarchicalReport supportReport,
-            HierarchicalReport tcReport) {
+            HierarchicalReport tcReport, HierarchicalReport supportStatusReport) {
         date = day;
         this.reviewReport = reviewReport;
         this.bfpReport = bfpReport;
         this.supportReport = supportReport;
         this.tcReport = tcReport;
+        this.supportStatusReport = supportStatusReport;
     }
 
     public HierarchicalReport getReportByType(ReportType type) {
@@ -39,6 +42,8 @@ public class ReportDay {
             return supportReport;
         } else if (type == ReportType.TC_BUGFIX) {
             return tcReport;
+        } else if (type == ReportType.SUPPORT_STATUS) {
+            return supportStatusReport;
         } else {
             return null;
         }
@@ -55,7 +60,8 @@ public class ReportDay {
      */
     public boolean hasReports() {
         return reviewReport != null || bfpReport != null
-                || supportReport != null || tcReport != null;
+                || supportReport != null || tcReport != null
+                || supportStatusReport != null;
     }
 
     public boolean hasReport(ReportType reportType) {
@@ -67,6 +73,8 @@ public class ReportDay {
             return supportReport != null;
         } else if (reportType == ReportType.TC_BUGFIX) {
             return tcReport != null;
+        } else if (reportType == ReportType.SUPPORT_STATUS) {
+            return supportStatusReport != null;
         } else {
             return false;
         }

@@ -14,7 +14,8 @@ public class ReportSummary {
 
     public static enum ReportType {
         REVIEW("Bugfixes in review"), BFP("Bugfix priority"), SUPPORT(
-                "Support Tickets"), TC_BUGFIX("Teamcity Bugs");
+                "Support Tickets"), TC_BUGFIX("Teamcity Bugs"), SUPPORT_STATUS(
+                "Support status");
 
         private final String realName;
 
@@ -50,6 +51,9 @@ public class ReportSummary {
         }
         if (reportDay.hasReport(ReportType.TC_BUGFIX)) {
             mostRecentReportForType.put(ReportType.TC_BUGFIX, reportDay);
+        }
+        if (reportDay.hasReport(ReportType.SUPPORT_STATUS)) {
+            mostRecentReportForType.put(ReportType.SUPPORT_STATUS, reportDay);
         }
     }
 
@@ -144,6 +148,7 @@ public class ReportSummary {
         days = getDaysWithReports();
         List<DateAndValue> result = new ArrayList<ReportDay.DateAndValue>();
 
+        boolean hasValues = false;
         for (ReportDay day : days) {
             if (!DateUtil
                     .isInDateRangeOnDayPrecision(start, end, day.getDate())) {

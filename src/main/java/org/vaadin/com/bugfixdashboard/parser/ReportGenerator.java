@@ -48,9 +48,11 @@ public class ReportGenerator {
                     .parseSupportReport(cal.getTime());
             HierarchicalReport tcReport = fileParser.parseTeamCityReport(cal
                     .getTime());
+            HierarchicalReport supportStatusReport = fileParser
+                    .parseSupportStatusReport(cal.getTime());
 
             ReportDay reportDay = new ReportDay(cal.getTime(), reviewReport,
-                    bfpReport, supportReport, tcReport);
+                    bfpReport, supportReport, tcReport, supportStatusReport);
             summary.addDay(reportDay);
             if (reportDay.hasReports()) {
                 System.out.println("This day has atleast one report!");
