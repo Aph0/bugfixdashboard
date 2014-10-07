@@ -1,25 +1,26 @@
 package org.vaadin.com.bugfixdashboard.views;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import org.vaadin.com.bugfixdashboard.component.MultiLevelVisualizationComponent;
-import org.vaadin.com.bugfixdashboard.data.HierarchicalReport;
-import org.vaadin.com.bugfixdashboard.data.ReportDay.DateAndValue;
-import org.vaadin.com.bugfixdashboard.data.ReportLevel;
 import org.vaadin.com.bugfixdashboard.data.ReportSummary;
 import org.vaadin.com.bugfixdashboard.data.ReportSummary.ReportType;
+import org.vaadin.com.bugfixdashboard.views.ReportPresenter.ReportViewDTO;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 public class ReportViewImpl extends VerticalLayout implements ReportView {
@@ -77,25 +78,43 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
     }
 
     @Override
-    public void showReport(ReportType type,
-            Map<String, List<DateAndValue>> historyData,
-            HierarchicalReport currentReportToShow,
-            List<ReportLevel> pieChartData) {
+    public void showReport(final ReportViewDTO dto) {
 
+        MultiLevelVisualizationComponent multiComponent = createReportComponent(dto);
+        Button fullScreenButton = new Button();
+        fullScreenButton.setStyleName(ValoTheme.BUTTON_ICON_ONLY);
+        fullScreenButton.addStyleName(ValoTheme.BUTTON_TINY);
+        fullScreenButton
+                .setIcon(new ThemeResource("icons/fullscreen16x16.png"));
+        multiComponent.addHeaderComponent(fullScreenButton);
+        multiComponent.setWidth("720px");
+        multiComponent.addStyleName("small-left-margin");
+        componentContainer.addComponent(multiComponent);
+
+        fullScreenButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                presenter.requestFullScreenFor(dto.type);
+
+            }
+        });
+
+    }
+
+    private MultiLevelVisualizationComponent createReportComponent(
+            ReportViewDTO reportViewDTO) {
         MultiLevelVisualizationComponent multiComponent = new MultiLevelVisualizationComponent();
 
-        multiComponent.setReportData(currentReportToShow);
+        multiComponent.setReportData(reportViewDTO.currentReportToShow);
 
-        for (String key : historyData.keySet()) {
-            multiComponent.addHistoricalData(key, historyData.get(key));
+        for (String key : reportViewDTO.historyData.keySet()) {
+            multiComponent.addHistoricalData(key,
+                    reportViewDTO.historyData.get(key));
         }
 
-        // Pie chart
-
-        multiComponent.setPieChartData(pieChartData);
-
-        multiComponent.setWidth("720px");
-        componentContainer.addComponent(multiComponent);
+        multiComponent.setPieChartData(reportViewDTO.pieChartData);
+        return multiComponent;
 
     }
 
@@ -130,6 +149,22 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
     @Override
     public void clearCurrentReports() {
         componentContainer.removeAllComponents();
+
+    }
+
+    @Override
+    public void showFullScreen(ReportViewDTO reportViewDTO) {
+        MultiLevelVisualizationComponent multiComponent = createReportComponent(reportViewDTO);
+        multiComponent.setFullSize();
+        Window w = new Window();
+        w.setContent(multiComponent);
+        w.setSizeFull();
+        w.setModal(false);
+        w.setResizable(true);
+        w.setDraggable(true);
+        w.setWidth("90%");
+
+        UI.getCurrent().addWindow(w);
 
     }
 }

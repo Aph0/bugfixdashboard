@@ -41,9 +41,12 @@
   
 	.view {
 	}
+
+	.small-left-margin {
+		margin-left: 10px;
+	}
 		
 	.report-component {
-		margin-left: 10px;
 		.h2 {
 			margin-bottom: 0.35em;
 			
@@ -62,6 +65,11 @@
 		
 		.v-label.level-1 {
 			font-weight: bold;
+		}
+		
+		.hoverable-label:hover {
+			border-right: 1px solid black;
+			border-bottom: 1px solid black;
 		}
 	}
 

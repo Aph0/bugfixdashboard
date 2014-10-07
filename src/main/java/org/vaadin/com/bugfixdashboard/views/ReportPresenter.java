@@ -25,6 +25,8 @@ public class ReportPresenter {
 
     private Date currentHistoryRepresentationEndDate;
 
+    private Map<ReportType, ReportViewDTO> lastCreatedReportTypeData = new HashMap<ReportSummary.ReportType, ReportPresenter.ReportViewDTO>();
+
     public ReportPresenter(ReportView view, ReportSummary reportSummary,
             int visibleDaySpan) {
         this.view = view;
@@ -47,21 +49,27 @@ public class ReportPresenter {
     private void showAllReportsUsingCurrentDates() {
 
         view.clearCurrentReports();
-        showReport(ReportType.REVIEW, reportSummary, 2);
-        showReport(ReportType.BFP, reportSummary, 2);
-        showReport(ReportType.SUPPORT, reportSummary, 2);
-        showReport(ReportType.TC_BUGFIX, reportSummary, 2);
-        showReport(ReportType.SUPPORT_STATUS, reportSummary, 1);
+        lastCreatedReportTypeData.put(ReportType.REVIEW,
+                showReport(ReportType.REVIEW, reportSummary, 2));
+        lastCreatedReportTypeData.put(ReportType.BFP,
+                showReport(ReportType.BFP, reportSummary, 2));
+        lastCreatedReportTypeData.put(ReportType.SUPPORT,
+                showReport(ReportType.SUPPORT, reportSummary, 2));
+        lastCreatedReportTypeData.put(ReportType.TC_BUGFIX,
+                showReport(ReportType.TC_BUGFIX, reportSummary, 2));
+        lastCreatedReportTypeData.put(ReportType.SUPPORT_STATUS,
+                showReport(ReportType.SUPPORT_STATUS, reportSummary, 1));
 
         view.updateDateSpanSilently(currentHistoryRepresentationStartDate,
                 currentHistoryRepresentationEndDate);
     }
 
-    private void showReport(ReportType type, ReportSummary summary,
+    private ReportViewDTO showReport(ReportType type, ReportSummary summary,
             int startLevel) {
 
         HierarchicalReport latestReport = getMostRecentReportFromSummary(type,
                 summary);
+        ReportViewDTO reportDTO = null;
 
         if (latestReport != null) {
 
@@ -74,13 +82,24 @@ public class ReportPresenter {
                     .getAllReportLevelsAsList(startLevel);
             // We exclude first level and nodes that are not leafs.
             pieChartData = sortOutOtherThanLeafNodes(pieChartData);
-
-            view.showReport(type, historyData, latestReport, pieChartData);
+            reportDTO = new ReportViewDTO(type, historyData, latestReport,
+                    pieChartData);
+            view.showReport(reportDTO);
         } else {
             // This is if NO report was found at all
             view.showEmptyReport(type);
         }
 
+        return reportDTO;
+    }
+
+    public void requestFullScreenFor(ReportType type) {
+        ReportViewDTO reportViewDTO = lastCreatedReportTypeData.get(type);
+        if (reportViewDTO != null) {
+
+            view.showFullScreen(reportViewDTO);
+
+        }
     }
 
     private List<ReportLevel> sortOutOtherThanLeafNodes(List<ReportLevel> levels) {
@@ -129,6 +148,23 @@ public class ReportPresenter {
         }
 
         showAllReportsUsingCurrentDates();
+    }
 
+    public static class ReportViewDTO {
+        public final ReportType type;
+        public final Map<String, List<DateAndValue>> historyData;
+        public final HierarchicalReport currentReportToShow;
+        public final List<ReportLevel> pieChartData;
+
+        public ReportViewDTO(ReportType type,
+                Map<String, List<DateAndValue>> historyData,
+                HierarchicalReport currentReportToShow,
+                List<ReportLevel> pieChartData) {
+            this.type = type;
+            this.historyData = historyData;
+            this.currentReportToShow = currentReportToShow;
+            this.pieChartData = pieChartData;
+
+        }
     }
 }

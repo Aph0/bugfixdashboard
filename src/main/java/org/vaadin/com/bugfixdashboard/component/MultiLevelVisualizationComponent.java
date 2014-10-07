@@ -50,7 +50,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     private VerticalLayout mainLayout = new VerticalLayout();
     private HorizontalLayout container = new HorizontalLayout();
-    private Label header;
+    private Label headerLabel;
+    private HorizontalLayout header = new HorizontalLayout();
     private GridLayout chartContainer = new GridLayout(1, 2);
 
     private HorizontalLayout chartFooter = new HorizontalLayout();
@@ -64,10 +65,16 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     public MultiLevelVisualizationComponent() {
         addStyleName("report-component");
 
-        header = new Label();
-        header.setStyleName(ValoTheme.LABEL_H2);
+        headerLabel = new Label();
+        headerLabel.setStyleName(ValoTheme.LABEL_H2);
         container.setSpacing(true);
         container.addStyleName("wrapping-container");
+
+        header.addComponent(headerLabel);
+        header.setExpandRatio(headerLabel, 1);
+        header.setComponentAlignment(headerLabel, Alignment.MIDDLE_LEFT);
+        header.setHeight(null);
+        header.setWidth("100%");
 
         mainLayout.addComponent(header);
         mainLayout.addComponent(container);
@@ -83,6 +90,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         mainLayout.setWidth("100%");
         grid.setWidth("100%");
         grid.setMargin(new MarginInfo(true, false, false, false));
+        grid.setHeight(null);
+
         container.setWidth("100%");
         initializeChartFooter();
         initializeAllCharts();
@@ -99,7 +108,11 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
             }
         });
+    }
 
+    public void addHeaderComponent(Component c) {
+        header.addComponent(c);
+        header.setComponentAlignment(c, Alignment.MIDDLE_RIGHT);
     }
 
     private void rotateList(LinkedList<ChartTypes> list, boolean left) {
@@ -157,10 +170,10 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         }
         // Removing the stylename in case it has been set at some point
         removeStyleName(HAS_NO_REPORTS_STYLENAME);
-        header.setValue(report.getHeader() + " ("
+        headerLabel.setValue(report.getHeader() + " ("
                 + formatDate(report.getReportDate()) + ")");
         if (report.isDue()) {
-            header.addStyleName("is-due");
+            headerLabel.addStyleName("is-due");
         }
 
         for (ReportLevel level : report.getReportRoots()) {
@@ -170,7 +183,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     }
 
     public void showAsEmptyReport(String reason) {
-        header.setValue(reason);
+        headerLabel.setValue(reason);
         chartContainer.removeAllComponents();
         addStyleName(HAS_NO_REPORTS_STYLENAME);
     }
@@ -294,7 +307,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         return sdf.format(date);
     }
 
-    private Label createLeftSpacedLabel(String text, int level) {
+    private Label createLeftSpacedLabel(String text, int level,
+            boolean isHoverable) {
         String spacer = "";
         for (int i = 0; i < level; i++) {
             spacer += "&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -302,6 +316,9 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         Label l = new Label(spacer + text);
         l.addStyleName("level-" + level);
         l.setContentMode(ContentMode.HTML);
+        if (isHoverable) {
+            l.addStyleName("hoverable-label");
+        }
         return l;
 
     }
@@ -315,7 +332,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     private void traverseLevelsRecursively(HierarchicalReport report,
             ReportLevel level) {
-        Label left = createLeftSpacedLabel(level.getName(), level.getLevel());
+        Label left = createLeftSpacedLabel(level.getName(), level.getLevel(),
+                level.hasValue());
         Label right = null;
         Label deltaLabel = new Label("");
         deltaLabel.setWidth(null);
@@ -342,5 +360,15 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         for (ReportLevel child : level.getChildren()) {
             traverseLevelsRecursively(report, child);
         }
+    }
+
+    public void setFullSize() {
+        setSizeFull();
+        mainLayout.setSizeFull();
+        container.setSizeFull();
+        mainLayout.setExpandRatio(container, 1);
+        chartContainer.setSizeFull();
+        chartContainer.setMargin(new MarginInfo(false, true, false, false));
+
     }
 }
