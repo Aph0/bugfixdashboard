@@ -8,6 +8,7 @@ import java.util.List;
 import org.vaadin.com.bugfixdashboard.data.HierarchicalReport;
 import org.vaadin.com.bugfixdashboard.data.ReportDay.DateAndValue;
 import org.vaadin.com.bugfixdashboard.data.ReportLevel;
+import org.vaadin.com.bugfixdashboard.data.ReportLevelDelta;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.AxisType;
@@ -53,7 +54,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     private GridLayout chartContainer = new GridLayout(1, 2);
 
     private HorizontalLayout chartFooter = new HorizontalLayout();
-    private GridLayout grid = new GridLayout(2, 1);
+    private GridLayout grid = new GridLayout(3, 1);
     private Chart historyChart;
     private Chart pieChart;
     private Chart currentChart;
@@ -163,7 +164,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         }
 
         for (ReportLevel level : report.getReportRoots()) {
-            traverseLevelsRecursively(level);
+            traverseLevelsRecursively(report, level);
         }
 
     }
@@ -305,25 +306,41 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     }
 
-    private void addGridRow(Component first, Component second) {
+    private void addGridRow(Component first, Component second, Component third) {
         grid.addComponent(first);
         grid.addComponent(second);
+        grid.addComponent(third);
 
     }
 
-    private void traverseLevelsRecursively(ReportLevel level) {
+    private void traverseLevelsRecursively(HierarchicalReport report,
+            ReportLevel level) {
         Label left = createLeftSpacedLabel(level.getName(), level.getLevel());
         Label right = null;
+        Label deltaLabel = new Label("");
+        deltaLabel.setWidth(null);
         if (level.hasValue()) {
-            right = new Label(level.getValue() + "");
+            String rightText = level.getValue() + "";
+            ReportLevelDelta delta = report.getDeltaFor(level);
+            if (delta != null && delta.getDelta() != null) {
+                // This is a bit ugly, but ensures that there is no delta for
+                // floats by mistake
+                if (delta.getDelta().doubleValue() < -0.00001D) {
+                    deltaLabel.setValue("(" + delta.getDelta() + ")");
+                } else if (delta.getDelta().doubleValue() > 0.00001D) {
+                    deltaLabel.setValue("(+" + delta.getDelta() + ")");
+                }
+            }
+            right = new Label(rightText);
             right.addStyleName("level-" + level.getLevel());
+            deltaLabel.addStyleName("level-" + level.getLevel());
         } else {
             right = new Label("");
         }
         right.setWidth(null);
-        addGridRow(left, right);
+        addGridRow(left, right, deltaLabel);
         for (ReportLevel child : level.getChildren()) {
-            traverseLevelsRecursively(child);
+            traverseLevelsRecursively(report, child);
         }
     }
 }

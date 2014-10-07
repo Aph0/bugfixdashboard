@@ -2,7 +2,9 @@ package org.vaadin.com.bugfixdashboard.data;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.vaadin.com.bugfixdashboard.util.DateUtil;
 
@@ -11,6 +13,8 @@ public class HierarchicalReport implements Report {
     private final String header;
 
     private List<ReportLevel> reportLevelRoots = new ArrayList<ReportLevel>();
+
+    private Map<ReportLevel, ReportLevelDelta> reportLevelDeltas = new HashMap<ReportLevel, ReportLevelDelta>();
 
     private final Date date;
 
@@ -104,6 +108,46 @@ public class HierarchicalReport implements Report {
             result.addAll(getFlatListFor(child));
         }
         return result;
+    }
+
+    /**
+     * Creates (or recreates) deltas for all common report levels (the
+     * differences between this and the other report). If otherReport is null,
+     * the deltas will be cleared;
+     * 
+     * @param otherReport
+     */
+    public void createReportLevelDeltas(HierarchicalReport otherReport) {
+        reportLevelDeltas.clear();
+        if (otherReport == null) {
+            return;
+        }
+
+        List<ReportLevel> allLevelsThis = this.getAllReportLevelsAsList();
+        List<ReportLevel> allLevelsOther = otherReport
+                .getAllReportLevelsAsList();
+        for (ReportLevel rl : allLevelsThis) {
+            int index = allLevelsOther.indexOf(rl);
+            if (index >= 0) {
+                ReportLevelDelta rld = new ReportLevelDelta(rl,
+                        allLevelsOther.get(index));
+
+                reportLevelDeltas.put(rl, rld);
+            }
+        }
+
+    }
+
+    /**
+     * returns ReportLevelDeltas (differences between this report and another),
+     * but only if createDeltas() has been called. Returns null if the
+     * ReportLevel is not found in both reports or the other ReportLevel is null
+     * 
+     * @param date
+     * @return
+     */
+    public ReportLevelDelta getDeltaFor(ReportLevel reportLevel) {
+        return reportLevelDeltas.get(reportLevel);
     }
 
     /**
