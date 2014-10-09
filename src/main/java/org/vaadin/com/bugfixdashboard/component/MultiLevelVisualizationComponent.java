@@ -95,7 +95,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         container.setWidth("100%");
         initializeChartFooter();
         initializeAllCharts();
-        selectChart(ChartTypes.PIE);
+        selectChart(ChartTypes.HISTORY);
 
         chartLink.add(ChartTypes.PIE);
         chartLink.add(ChartTypes.HISTORY);
@@ -327,6 +327,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         grid.addComponent(first);
         grid.addComponent(second);
         grid.addComponent(third);
+        grid.setComponentAlignment(third, Alignment.MIDDLE_RIGHT);
 
     }
 
