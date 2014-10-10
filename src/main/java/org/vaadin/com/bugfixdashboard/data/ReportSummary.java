@@ -96,7 +96,7 @@ public class ReportSummary {
         if (daysContainingReport.size() > 0) {
             return daysContainingReport.get(daysContainingReport.size() - 1);
         } else {
-            return null;
+            return new ReportDay(new Date(), null, null, null, null, null);
         }
     }
 
