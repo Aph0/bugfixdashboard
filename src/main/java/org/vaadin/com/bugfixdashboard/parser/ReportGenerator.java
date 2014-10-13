@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.vaadin.com.bugfixdashboard.data.HierarchicalReport;
 import org.vaadin.com.bugfixdashboard.data.ReportDay;
@@ -39,40 +41,35 @@ public class ReportGenerator {
 
         // TODO: At the moment we create deltas with difference to one day back,
         // but we may want to change this behavior at some point
+
+        List<ReportType> reportTypes = properties.getReportTypes();
         ReportDay lastReportDay = null;
 
+        System.out.println("Trying to parse day: "
+                + sdfForLoggin.format(cal.getTime()));
         while (cal.getTime().before(now)) {
-            // TODO: Logger
-            System.out.println("Trying to parse day: "
-                    + sdfForLoggin.format(cal.getTime()));
-            HierarchicalReport reviewReport = fileParser.parseReviewReport(cal
-                    .getTime());
-            HierarchicalReport bfpReport = fileParser.parseBFPReport(cal
-                    .getTime());
-            HierarchicalReport supportReport = fileParser
-                    .parseSupportReport(cal.getTime());
-            HierarchicalReport tcReport = fileParser.parseTeamCityReport(cal
-                    .getTime());
-            HierarchicalReport supportStatusReport = fileParser
-                    .parseSupportStatusReport(cal.getTime());
+            LinkedHashMap<ReportType, HierarchicalReport> reportTypesToReportComponents = new LinkedHashMap<ReportSummary.ReportType, HierarchicalReport>();
+            for (ReportType repType : reportTypes) {
+                HierarchicalReport report = fileParser.parseReport(
+                        cal.getTime(), repType);
+                if (report != null) {
+                    reportTypesToReportComponents.put(repType, report);
+                }
+            }
 
             if (lastReportDay != null) {
-                createReportLevelDeltas(reviewReport,
-                        lastReportDay.getReportByType(ReportType.REVIEW));
-                createReportLevelDeltas(bfpReport,
-                        lastReportDay.getReportByType(ReportType.BFP));
-                createReportLevelDeltas(supportReport,
-                        lastReportDay.getReportByType(ReportType.SUPPORT));
-                createReportLevelDeltas(tcReport,
-                        lastReportDay.getReportByType(ReportType.TC_BUGFIX));
-                createReportLevelDeltas(supportStatusReport,
-                        lastReportDay
-                                .getReportByType(ReportType.SUPPORT_STATUS));
+
+                for (HierarchicalReport report : reportTypesToReportComponents
+                        .values()) {
+                    createReportLevelDeltas(report,
+                            lastReportDay.getReportByType(report
+                                    .getReportType()));
+                }
 
             }
 
-            ReportDay reportDay = new ReportDay(cal.getTime(), reviewReport,
-                    bfpReport, supportReport, tcReport, supportStatusReport);
+            ReportDay reportDay = new ReportDay(cal.getTime(),
+                    reportTypesToReportComponents);
             lastReportDay = reportDay;
             summary.addDay(reportDay);
             if (reportDay.hasReports()) {

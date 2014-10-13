@@ -1,5 +1,6 @@
 package org.vaadin.com.bugfixdashboard.component;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -61,6 +62,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     private Chart currentChart;
     private LinkedList<ChartTypes> chartLink = new LinkedList<ChartTypes>();
     private final String HAS_NO_REPORTS_STYLENAME = "is-empty";
+    private String currentNumberFormat = "#.#";
 
     public MultiLevelVisualizationComponent() {
         addStyleName("report-component");
@@ -160,9 +162,12 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     /**
      * Sets the data for the current report to be displayed.
+     * 
+     * @param string
      */
-    public void setReportData(HierarchicalReport report) {
+    public void setReportData(HierarchicalReport report, String numberFormat) {
 
+        currentNumberFormat = numberFormat;
         grid.removeAllComponents();
         if (report == null) {
             showAsEmptyReport("<Empty report>");
@@ -333,21 +338,28 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
 
     private void traverseLevelsRecursively(HierarchicalReport report,
             ReportLevel level) {
+        DecimalFormat decimalFormatter = new DecimalFormat(currentNumberFormat);
+
         Label left = createLeftSpacedLabel(level.getName(), level.getLevel(),
                 level.hasValue());
         Label right = null;
         Label deltaLabel = new Label("");
         deltaLabel.setWidth(null);
         if (level.hasValue()) {
-            String rightText = level.getValue() + "";
+            String rightText = decimalFormatter.format(level.getValue()) + "";
             ReportLevelDelta delta = report.getDeltaFor(level);
             if (delta != null && delta.getDelta() != null) {
+
+                String deltaStr = decimalFormatter.format(delta.getDelta()
+                        .doubleValue());
+
                 // This is a bit ugly, but ensures that there is no delta for
                 // floats by mistake
+
                 if (delta.getDelta().doubleValue() < -0.00001D) {
-                    deltaLabel.setValue("(" + delta.getDelta() + ")");
+                    deltaLabel.setValue("(" + deltaStr + ")");
                 } else if (delta.getDelta().doubleValue() > 0.00001D) {
-                    deltaLabel.setValue("(+" + delta.getDelta() + ")");
+                    deltaLabel.setValue("(+" + deltaStr + ")");
                 }
             }
             right = new Label(rightText);

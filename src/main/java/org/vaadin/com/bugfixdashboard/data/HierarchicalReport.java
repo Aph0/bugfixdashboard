@@ -6,11 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.vaadin.com.bugfixdashboard.data.ReportSummary.ReportType;
 import org.vaadin.com.bugfixdashboard.util.DateUtil;
 
 public class HierarchicalReport implements Report {
-
-    private final String header;
 
     private List<ReportLevel> reportLevelRoots = new ArrayList<ReportLevel>();
 
@@ -18,9 +17,12 @@ public class HierarchicalReport implements Report {
 
     private final Date date;
 
-    public HierarchicalReport(Date date, String header) {
+    private final ReportType reportType;
+
+    public HierarchicalReport(Date date, ReportType reportType) {
         this.date = date;
-        this.header = header;
+
+        this.reportType = reportType;
     }
 
     /**
@@ -35,7 +37,7 @@ public class HierarchicalReport implements Report {
     }
 
     public String getHeader() {
-        return header;
+        return reportType.getName();
     }
 
     public List<ReportLevel> getReportRoots() {
@@ -160,5 +162,14 @@ public class HierarchicalReport implements Report {
         Date now = new Date();
         return !DateUtil.isInDateRangeOnDayPrecision(now, now, date);
 
+    }
+
+    /**
+     * Returns the report type
+     * 
+     * @return
+     */
+    public ReportType getReportType() {
+        return reportType;
     }
 }

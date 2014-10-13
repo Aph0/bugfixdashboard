@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,49 +13,111 @@ import org.vaadin.com.bugfixdashboard.util.DateUtil;
 
 public class ReportSummary {
 
-    public static enum ReportType {
-        REVIEW("Bugfixes in review"), BFP("Bugfix priority"), SUPPORT(
-                "Support Tickets"), TC_BUGFIX("Teamcity Bugs"), SUPPORT_STATUS(
-                "Support status");
-
-        private final String realName;
-
-        public String realName() {
-            return realName;
-        }
-
-        private ReportType(String realName) {
-            this.realName = realName;
-        }
-    };
-
     private final List<ReportDay> allReportDays = new ArrayList<ReportDay>();
     private final List<ReportDay> daysContainingReport = new ArrayList<ReportDay>();
     private final Map<Date, ReportDay> dayToReportDay = new HashMap<Date, ReportDay>();
-    private final Map<ReportType, ReportDay> mostRecentReportForType = new HashMap<ReportSummary.ReportType, ReportDay>();
+    private final Map<ReportType, ReportDay> mostRecentReportForType = new LinkedHashMap<ReportSummary.ReportType, ReportDay>();
+
+    private final List<ReportType> allReportTypes = new ArrayList<ReportSummary.ReportType>();
+
+    /**
+     * The id determines the Report type. If the id's match, two report types
+     * are equals, otherwise NOT
+     * 
+     * 
+     */
+    public static class ReportType {
+
+        private final String name;
+        private final String numberFormat;
+        private final String filePrefix;
+        private final Integer id;
+        private final Integer pieChartParseLevelStart;
+
+        public ReportType(String name, String numberFormat, String filePrefix,
+                Integer id, Integer pieChartParseLevelStart) {
+            this.name = name;
+            this.pieChartParseLevelStart = pieChartParseLevelStart;
+            if (id == null) {
+                throw new IllegalArgumentException(
+                        "id cannot be null. Please add id prefixes to the components in the properties file [id=1,2,...,n]");
+            }
+            this.id = id;
+            if (numberFormat == null) {
+                this.numberFormat = "#,#";
+            } else {
+                this.numberFormat = numberFormat;
+            }
+            this.filePrefix = filePrefix;
+
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getNumberFormat() {
+            return numberFormat;
+        }
+
+        public String getFilePrefix() {
+            return filePrefix;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            ReportType other = (ReportType) obj;
+            if (other == null) {
+                return false;
+            }
+            return id.equals(other.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return id.hashCode();
+        }
+
+        public Integer getPieChartParseLevelStart() {
+            return pieChartParseLevelStart;
+        }
+
+    };
 
     public void addDay(ReportDay reportDay) {
         allReportDays.add(reportDay);
         if (reportDay.hasReports()) {
             daysContainingReport.add(reportDay);
+
+            for (ReportType type : reportDay.getReportTypesToReports().keySet()) {
+                if (!allReportTypes.contains(type)) {
+                    allReportTypes.add(type);
+                }
+            }
         }
         dayToReportDay.put(DateUtil.clearDateBelowDays(reportDay.getDate()),
                 reportDay);
-        if (reportDay.hasReport(ReportType.BFP)) {
-            mostRecentReportForType.put(ReportType.BFP, reportDay);
+
+        LinkedHashMap<ReportType, HierarchicalReport> reportTypesToReports = reportDay
+                .getReportTypesToReports();
+
+        if (!reportTypesToReports.isEmpty()) {
+            for (ReportType existing : reportTypesToReports.keySet()) {
+                // This overwrites the existing report if a newer one is found
+                mostRecentReportForType.put(existing, reportDay);
+            }
+
         }
-        if (reportDay.hasReport(ReportType.REVIEW)) {
-            mostRecentReportForType.put(ReportType.REVIEW, reportDay);
-        }
-        if (reportDay.hasReport(ReportType.SUPPORT)) {
-            mostRecentReportForType.put(ReportType.SUPPORT, reportDay);
-        }
-        if (reportDay.hasReport(ReportType.TC_BUGFIX)) {
-            mostRecentReportForType.put(ReportType.TC_BUGFIX, reportDay);
-        }
-        if (reportDay.hasReport(ReportType.SUPPORT_STATUS)) {
-            mostRecentReportForType.put(ReportType.SUPPORT_STATUS, reportDay);
-        }
+
+    }
+
+    /**
+     * Returns all report types that have been registered upon project startup
+     * 
+     * @return
+     */
+    public List<ReportType> getAllExistingReportTypes() {
+        return Collections.unmodifiableList(allReportTypes);
     }
 
     /**
@@ -96,7 +159,9 @@ public class ReportSummary {
         if (daysContainingReport.size() > 0) {
             return daysContainingReport.get(daysContainingReport.size() - 1);
         } else {
-            return new ReportDay(new Date(), null, null, null, null, null);
+            return new ReportDay(
+                    new Date(),
+                    new LinkedHashMap<ReportSummary.ReportType, HierarchicalReport>());
         }
     }
 

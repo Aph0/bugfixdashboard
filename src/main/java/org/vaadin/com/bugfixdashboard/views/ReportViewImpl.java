@@ -106,7 +106,8 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
             ReportViewDTO reportViewDTO) {
         MultiLevelVisualizationComponent multiComponent = new MultiLevelVisualizationComponent();
 
-        multiComponent.setReportData(reportViewDTO.currentReportToShow);
+        multiComponent.setReportData(reportViewDTO.currentReportToShow,
+                reportViewDTO.type.getNumberFormat());
 
         for (String key : reportViewDTO.historyData.keySet()) {
             multiComponent.addHistoricalData(key,
@@ -127,7 +128,7 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
     @Override
     public void showEmptyReport(ReportType type) {
         MultiLevelVisualizationComponent multiComponent = new MultiLevelVisualizationComponent();
-        multiComponent.showAsEmptyReport("No Report for '" + type.realName()
+        multiComponent.showAsEmptyReport("No Report for '" + type.getName()
                 + "'");
         multiComponent.setWidth("650px");
         componentContainer.addComponent(multiComponent);

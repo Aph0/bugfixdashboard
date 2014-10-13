@@ -3,21 +3,28 @@ package org.vaadin.com.bugfixdashboard.parser;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
+
+import org.vaadin.com.bugfixdashboard.data.ReportSummary.ReportType;
 
 public class PropertyReader {
 
     private static final String ROOTSCAN_DIRECTORY = "rootscan_directory";
-    private static final String FILEPREFIX_REVIEW = "fileprefix_review";
-    private static final String FILEPREFIX_BFP = "fileprefix_bfp";
-    private static final String FILEPREFIX_SUPPORT = "fileprefix_support";
-    private static final String FILEPREFIX_TEAMCITY = "fileprefix_failingtests";
-    private static final String FILEPREFIX_SUPPORT_STATUS = "fileprefix_support_status";
 
     private static final String DAY_DATE_FORMAT = "file_date_format";
     private static final String FOLDER_DATE_FORMAT = "folder_date_format";
+    private static final String COMPONENT_IDS = "component_ids";
+
+    private static final String COMPONENT_FILEPREFIX_ = "fileprefix_";
+    private static final String COMPONENT_NAMEPREFIX_ = "component_";
+    private static final String COMPONENT_NUMBER_FORMAT_ = "number_representation_";
+    private static final String COMPONENT_PIECHART_PARSELEVEL_ = "piechart_parse_level_";
 
     public static final String FILENAMESCAN_START_DATE = "filename_scan_startdate";
 
@@ -29,14 +36,10 @@ public class PropertyReader {
 
     private String rootScanDirectory;
 
-    private String filePrefixReview;
-    private String filePrefixBFP;
-    private String filePrefixSupport;
-    private String filePrefixTeamCity;
-    private String filePrefixSupportStatus;
-
     private String fileDateFormat;
     private String folderDateFormat;
+
+    private final List<ReportType> reportTypes = new ArrayList<ReportType>();
 
     private int historyRepresentationSpan;
 
@@ -58,14 +61,71 @@ public class PropertyReader {
                 .getProperty(HISTORY_REPRESENTATION_DAYS_BACK));
 
         rootScanDirectory = currentProperties.getProperty(ROOTSCAN_DIRECTORY);
-        filePrefixReview = currentProperties.getProperty(FILEPREFIX_REVIEW);
-        filePrefixBFP = currentProperties.getProperty(FILEPREFIX_BFP);
-        filePrefixSupport = currentProperties.getProperty(FILEPREFIX_SUPPORT);
-        filePrefixTeamCity = currentProperties.getProperty(FILEPREFIX_TEAMCITY);
-        filePrefixSupportStatus = currentProperties
-                .getProperty(FILEPREFIX_SUPPORT_STATUS);
         fileDateFormat = currentProperties.getProperty(DAY_DATE_FORMAT);
         folderDateFormat = currentProperties.getProperty(FOLDER_DATE_FORMAT);
+
+        readComponentSpecificData();
+    }
+
+    private void readComponentSpecificData() {
+        reportTypes.clear();
+        String ids = currentProperties.getProperty(COMPONENT_IDS);
+        if (ids == null || ids.length() <= 0) {
+            return;
+        }
+
+        List<String> idList = Arrays.asList(ids.split(","));
+
+        for (String idStr : idList) {
+            String filePrefix = getObligatoryComponentProperty(
+                    COMPONENT_FILEPREFIX_, idStr);
+            String componentName = getObligatoryComponentProperty(
+                    COMPONENT_NAMEPREFIX_, idStr);
+            String numberFormat = getOptionalOrDefaultComponentProperty(
+                    COMPONENT_NUMBER_FORMAT_, idStr, "#,#");
+            String pieChartParseLevelStartStr = getOptionalOrDefaultComponentProperty(
+                    COMPONENT_PIECHART_PARSELEVEL_, idStr, "2");
+            int idInt = Integer.parseInt(idStr);
+
+            Integer pieChartParseLevelStart = Integer
+                    .parseInt(pieChartParseLevelStartStr);
+
+            ReportType reporType = new ReportType(componentName, numberFormat,
+                    filePrefix, idInt, pieChartParseLevelStart);
+            reportTypes.add(reporType);
+        }
+    }
+
+    /**
+     * Throws a RTE if property not found. Will never return null
+     * 
+     * @param key
+     * @return
+     */
+    private String getObligatoryComponentProperty(String componentPrefixKey,
+            String idString) {
+        String property = currentProperties.getProperty(componentPrefixKey
+                + idString);
+        if (property == null) {
+            throw new RuntimeException("Could not find obligatory value for ["
+                    + componentPrefixKey + idString + "]");
+        }
+
+        return property;
+    }
+
+    /**
+     * If key not found, default value will be returned. Default value may be
+     * null
+     * 
+     * @param key
+     * @param string
+     * @return
+     */
+    private String getOptionalOrDefaultComponentProperty(
+            String componentPrefixKey, String id, String defaultValue) {
+        return currentProperties.getProperty(componentPrefixKey + id,
+                defaultValue);
     }
 
     // public String getValue(String key) {
@@ -126,24 +186,8 @@ public class PropertyReader {
             return rootScanDirectory;
         }
 
-        public String getFilePrefixReview() {
-            return filePrefixReview;
-        }
-
-        public String getFilePrefixBFP() {
-            return filePrefixBFP;
-        }
-
-        public String getFilePrefixSupport() {
-            return filePrefixSupport;
-        }
-
-        public String getFilePrefixSupportStatus() {
-            return filePrefixSupportStatus;
-        }
-
-        public String getFilePrefixTeamCity() {
-            return filePrefixTeamCity;
+        public List<ReportType> getReportTypes() {
+            return Collections.unmodifiableList(reportTypes);
         }
 
         public String getFileDateFormat() {

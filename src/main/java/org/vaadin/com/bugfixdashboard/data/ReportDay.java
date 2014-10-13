@@ -1,6 +1,7 @@
 package org.vaadin.com.bugfixdashboard.data;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 import org.vaadin.com.bugfixdashboard.data.ReportSummary.ReportType;
 
@@ -12,41 +13,19 @@ public class ReportDay {
 
     private final Date date;
 
-    private final HierarchicalReport reviewReport;
+    private final LinkedHashMap<ReportType, HierarchicalReport> reportTypeToReportComponent = new LinkedHashMap<ReportSummary.ReportType, HierarchicalReport>();
 
-    private final HierarchicalReport bfpReport;
-
-    private final HierarchicalReport supportReport;
-
-    private final HierarchicalReport supportStatusReport;
-
-    private final HierarchicalReport tcReport;
-
-    public ReportDay(Date day, HierarchicalReport reviewReport,
-            HierarchicalReport bfpReport, HierarchicalReport supportReport,
-            HierarchicalReport tcReport, HierarchicalReport supportStatusReport) {
+    public ReportDay(
+            Date day,
+            LinkedHashMap<ReportType, HierarchicalReport> orderedReportComponents) {
         date = day;
-        this.reviewReport = reviewReport;
-        this.bfpReport = bfpReport;
-        this.supportReport = supportReport;
-        this.tcReport = tcReport;
-        this.supportStatusReport = supportStatusReport;
+        reportTypeToReportComponent.putAll(orderedReportComponents);
     }
 
-    public HierarchicalReport getReportByType(ReportType type) {
-        if (type == ReportType.BFP) {
-            return bfpReport;
-        } else if (type == ReportType.REVIEW) {
-            return reviewReport;
-        } else if (type == ReportType.SUPPORT) {
-            return supportReport;
-        } else if (type == ReportType.TC_BUGFIX) {
-            return tcReport;
-        } else if (type == ReportType.SUPPORT_STATUS) {
-            return supportStatusReport;
-        } else {
-            return null;
-        }
+    public HierarchicalReport getReportByType(ReportType reportType) {
+
+        return reportTypeToReportComponent.get(reportType);
+
     }
 
     public Date getDate() {
@@ -59,25 +38,13 @@ public class ReportDay {
      * @return
      */
     public boolean hasReports() {
-        return reviewReport != null || bfpReport != null
-                || supportReport != null || tcReport != null
-                || supportStatusReport != null;
+
+        return !reportTypeToReportComponent.isEmpty();
+
     }
 
     public boolean hasReport(ReportType reportType) {
-        if (reportType == ReportType.BFP) {
-            return bfpReport != null;
-        } else if (reportType == ReportType.REVIEW) {
-            return reviewReport != null;
-        } else if (reportType == ReportType.SUPPORT) {
-            return supportReport != null;
-        } else if (reportType == ReportType.TC_BUGFIX) {
-            return tcReport != null;
-        } else if (reportType == ReportType.SUPPORT_STATUS) {
-            return supportStatusReport != null;
-        } else {
-            return false;
-        }
+        return reportTypeToReportComponent.get(reportType) != null;
     }
 
     public static class DateAndValue {
@@ -90,6 +57,10 @@ public class ReportDay {
             this.date = date;
             this.value = value;
         }
+    }
+
+    public LinkedHashMap<ReportType, HierarchicalReport> getReportTypesToReports() {
+        return reportTypeToReportComponent;
     }
 
 }

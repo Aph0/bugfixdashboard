@@ -23,68 +23,12 @@ public class ReportFileParser {
         this.properties = properties;
     }
 
-    /**
-     * @param date
-     * @return null if no such report was found for specified date
-     */
-    public HierarchicalReport parseReviewReport(final Date date) {
+    public HierarchicalReport parseReport(Date date, final ReportType reportType) {
+        date = DateUtil.clearDateBelowDays(date);
         HierarchicalReport report = new HierarchicalReport(
-                DateUtil.clearDateBelowDays(date), ReportType.REVIEW.realName());
+                DateUtil.clearDateBelowDays(date), reportType);
 
-        return parseReport(date, properties.getFilePrefixReview(), report);
-    }
-
-    /**
-     * @param date
-     * @return null if no such report was found for specified date
-     */
-    public HierarchicalReport parseBFPReport(final Date date) {
-        HierarchicalReport report = new HierarchicalReport(
-                DateUtil.clearDateBelowDays(date), ReportType.BFP.realName());
-
-        return parseReport(date, properties.getFilePrefixBFP(), report);
-    }
-
-    /**
-     * @param date
-     * @return null if no such report was found for specified date
-     */
-    public HierarchicalReport parseSupportReport(final Date date) {
-        HierarchicalReport report = new HierarchicalReport(
-                DateUtil.clearDateBelowDays(date),
-                ReportType.SUPPORT.realName());
-
-        return parseReport(date, properties.getFilePrefixSupport(), report);
-    }
-
-    /**
-     * @param date
-     * @return null if no such report was found for specified date
-     */
-    public HierarchicalReport parseSupportStatusReport(final Date date) {
-        HierarchicalReport report = new HierarchicalReport(
-                DateUtil.clearDateBelowDays(date),
-                ReportType.SUPPORT_STATUS.realName());
-
-        return parseReport(date, properties.getFilePrefixSupportStatus(),
-                report);
-    }
-
-    /**
-     * @param date
-     * @return null if no such report was found for specified date
-     */
-    public HierarchicalReport parseTeamCityReport(final Date date) {
-        HierarchicalReport report = new HierarchicalReport(
-                DateUtil.clearDateBelowDays(date),
-                ReportType.TC_BUGFIX.realName());
-
-        return parseReport(date, properties.getFilePrefixTeamCity(), report);
-    }
-
-    private HierarchicalReport parseReport(final Date date,
-            final String filePrefix, final HierarchicalReport reportToPopulate) {
-        String fileName = constructFileName(date, filePrefix);
+        String fileName = constructFileName(date, reportType.getFilePrefix());
         File file = new File(fileName);
         if (!file.exists()) {
             System.out.println("File did not exist: " + fileName);
@@ -112,10 +56,10 @@ public class ReportFileParser {
             for (Element element : rootBody.get(0).children()) {
                 ReportLevel rootLevel = createReportLevelsRecursively(element,
                         null);
-                reportToPopulate.addRootLevel(rootLevel);
+                report.addRootLevel(rootLevel);
             }
 
-            return reportToPopulate;
+            return report;
 
         } catch (IOException e) {
             // TODO: handle this

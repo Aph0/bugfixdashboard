@@ -49,23 +49,17 @@ public class ReportPresenter {
     private void showAllReportsUsingCurrentDates() {
 
         view.clearCurrentReports();
-        lastCreatedReportTypeData.put(ReportType.REVIEW,
-                showReport(ReportType.REVIEW, reportSummary, 2));
-        lastCreatedReportTypeData.put(ReportType.BFP,
-                showReport(ReportType.BFP, reportSummary, 2));
-        lastCreatedReportTypeData.put(ReportType.SUPPORT,
-                showReport(ReportType.SUPPORT, reportSummary, 2));
-        lastCreatedReportTypeData.put(ReportType.TC_BUGFIX,
-                showReport(ReportType.TC_BUGFIX, reportSummary, 2));
-        lastCreatedReportTypeData.put(ReportType.SUPPORT_STATUS,
-                showReport(ReportType.SUPPORT_STATUS, reportSummary, 1));
+
+        for (ReportType type : reportSummary.getAllExistingReportTypes()) {
+            lastCreatedReportTypeData
+                    .put(type, showReport(type, reportSummary));
+        }
 
         view.updateDateSpanSilently(currentHistoryRepresentationStartDate,
                 currentHistoryRepresentationEndDate);
     }
 
-    private ReportViewDTO showReport(ReportType type, ReportSummary summary,
-            int startLevel) {
+    private ReportViewDTO showReport(ReportType type, ReportSummary summary) {
 
         HierarchicalReport latestReport = getMostRecentReportFromSummary(type,
                 summary);
@@ -79,7 +73,7 @@ public class ReportPresenter {
                     currentHistoryRepresentationEndDate);
 
             List<ReportLevel> pieChartData = latestReport
-                    .getAllReportLevelsAsList(startLevel);
+                    .getAllReportLevelsAsList(type.getPieChartParseLevelStart());
             // We exclude first level and nodes that are not leafs.
             pieChartData = sortOutOtherThanLeafNodes(pieChartData);
             reportDTO = new ReportViewDTO(type, historyData, latestReport,
