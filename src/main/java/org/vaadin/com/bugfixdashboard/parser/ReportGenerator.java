@@ -29,7 +29,8 @@ public class ReportGenerator {
 
     public ReportSummary generate() {
 
-        ReportSummary summary = new ReportSummary();
+        List<ReportType> reportTypes = properties.getReportTypes();
+        ReportSummary summary = new ReportSummary(reportTypes);
 
         Date startDate = properties.getFileScanStart();
         Date now = new Date();
@@ -42,7 +43,6 @@ public class ReportGenerator {
         // TODO: At the moment we create deltas with difference to one day back,
         // but we may want to change this behavior at some point
 
-        List<ReportType> reportTypes = properties.getReportTypes();
         ReportDay lastReportDay = null;
 
         System.out.println("Trying to parse day: "

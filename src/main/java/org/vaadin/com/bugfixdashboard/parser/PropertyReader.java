@@ -45,6 +45,8 @@ public class PropertyReader {
 
     public final ApplicationReadableProperties readableProperties;
 
+    public static String DEFAULT_NUMBER_FORMAT = "0.#";
+
     public PropertyReader() {
         readableProperties = new ApplicationReadableProperties();
     }
@@ -82,7 +84,7 @@ public class PropertyReader {
             String componentName = getObligatoryComponentProperty(
                     COMPONENT_NAMEPREFIX_, idStr);
             String numberFormat = getOptionalOrDefaultComponentProperty(
-                    COMPONENT_NUMBER_FORMAT_, idStr, "#,#");
+                    COMPONENT_NUMBER_FORMAT_, idStr, DEFAULT_NUMBER_FORMAT);
             String pieChartParseLevelStartStr = getOptionalOrDefaultComponentProperty(
                     COMPONENT_PIECHART_PARSELEVEL_, idStr, "2");
             int idInt = Integer.parseInt(idStr);

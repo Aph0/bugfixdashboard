@@ -43,11 +43,9 @@ public class ReportSummary {
                         "id cannot be null. Please add id prefixes to the components in the properties file [id=1,2,...,n]");
             }
             this.id = id;
-            if (numberFormat == null) {
-                this.numberFormat = "#,#";
-            } else {
-                this.numberFormat = numberFormat;
-            }
+
+            this.numberFormat = numberFormat;
+
             this.filePrefix = filePrefix;
 
         }
@@ -84,16 +82,16 @@ public class ReportSummary {
 
     };
 
+    public ReportSummary(List<ReportType> reportTypes) {
+        allReportTypes.addAll(reportTypes);
+
+    }
+
     public void addDay(ReportDay reportDay) {
         allReportDays.add(reportDay);
         if (reportDay.hasReports()) {
             daysContainingReport.add(reportDay);
 
-            for (ReportType type : reportDay.getReportTypesToReports().keySet()) {
-                if (!allReportTypes.contains(type)) {
-                    allReportTypes.add(type);
-                }
-            }
         }
         dayToReportDay.put(DateUtil.clearDateBelowDays(reportDay.getDate()),
                 reportDay);

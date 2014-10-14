@@ -62,7 +62,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     private Chart currentChart;
     private LinkedList<ChartTypes> chartLink = new LinkedList<ChartTypes>();
     private final String HAS_NO_REPORTS_STYLENAME = "is-empty";
-    private String currentNumberFormat = "#.#";
+    private String currentNumberFormat = "";
 
     public MultiLevelVisualizationComponent() {
         addStyleName("report-component");
@@ -168,6 +168,7 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
     public void setReportData(HierarchicalReport report, String numberFormat) {
 
         currentNumberFormat = numberFormat;
+
         grid.removeAllComponents();
         if (report == null) {
             showAsEmptyReport("<Empty report>");

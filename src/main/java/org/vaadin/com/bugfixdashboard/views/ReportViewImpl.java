@@ -130,7 +130,8 @@ public class ReportViewImpl extends VerticalLayout implements ReportView {
         MultiLevelVisualizationComponent multiComponent = new MultiLevelVisualizationComponent();
         multiComponent.showAsEmptyReport("No Report for '" + type.getName()
                 + "'");
-        multiComponent.setWidth("650px");
+        multiComponent.setWidth("720px");
+        multiComponent.addStyleName("small-left-margin");
         componentContainer.addComponent(multiComponent);
     }
 
