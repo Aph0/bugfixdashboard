@@ -99,8 +99,8 @@ public class MultiLevelVisualizationComponent extends CustomComponent {
         initializeAllCharts();
         selectChart(ChartTypes.HISTORY);
 
-        chartLink.add(ChartTypes.PIE);
         chartLink.add(ChartTypes.HISTORY);
+        chartLink.add(ChartTypes.PIE);
 
         grid.addLayoutClickListener(new LayoutClickListener() {
 
